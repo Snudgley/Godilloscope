@@ -1,0 +1,15 @@
+[gd_resource type="AudioBusLayout" load_steps=3 format=2]
+
+[sub_resource type="AudioEffectHighPassFilter" id=1]
+resource_name = "HighPassFilter"
+cutoff_hz = 2.0
+
+[sub_resource type="AudioEffectSpectrumAnalyzer" id=2]
+resource_name = "SpectrumAnalyzer"
+fft_size = 0
+
+[resource]
+bus/0/effect/0/effect = SubResource( 1 )
+bus/0/effect/0/enabled = true
+bus/0/effect/1/effect = SubResource( 2 )
+bus/0/effect/1/enabled = true

@@ -21,6 +21,10 @@ config/icon="res://Default.png"
 config/macos_native_icon="res://Default.icns"
 config/windows_native_icon="res://Icon.ico"
 
+[audio]
+
+default_bus_layout="res://audiobuslayout.tres"
+
 [rendering]
 
 quality/driver/driver_name="GLES2"

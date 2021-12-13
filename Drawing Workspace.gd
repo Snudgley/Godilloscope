@@ -67,7 +67,7 @@ onready var y_channel = get_node("VBoxContainer/Bottom Half/Y Axis/Y Axis/Y Draw
 onready var Audio = $AudioStreamPlayer
 
 var lines_array = []
-var Audio_playing = false
+var Audio_playing = true
 var lock_image = false
 
 enum File_Dialog_Modes{Open_Project, Open_Drawing, Open_Image, Save_Project, Save_Drawing, Save_Sample}
@@ -80,6 +80,7 @@ func _ready():
 	PlaySample = find_node("Play Sample", true, false)
 	
 	EditorVolume = find_node("Volume", true, false)
+	EditorVolume.value = .2
 	FrequencyApproximate = find_node("FrequencyApprox", true, false)
 	FrequencyExact = find_node("FrequencyExact", true, false)
 	FrequencyNote = find_node("Note", true, false)
@@ -157,6 +158,8 @@ func _on_Paste_Drawing_pressed():
 		XY_Viewport.emit_signal('line_updated', lines_array)
 		_on_XY_Drawing_line_deselected()
 
+
+		
 func _on_Save_Drawing_pressed():
 	_open_file_dialog("Save Drawing", ["*.dat"], File_Dialog_Modes.Save_Drawing)
 
@@ -519,3 +522,4 @@ func _LineRotationExact_changed(value):
 func _on_Wobble_Adjust_value_changed(value):
 	yield(get_tree().create_timer(0.01), 'timeout')
 	_generate_new_audio()
+

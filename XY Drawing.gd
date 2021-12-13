@@ -7,6 +7,7 @@ var lines_data = []
 
 var snapping = true
 var lock_image = false
+var smoothing_amount = 1
 var snap_bias = 20
 var line_size = 1
 var selected_line = -1
@@ -81,6 +82,18 @@ func _on_XY_Drawing_gui_input(event):
 				_scale_drawing(Vector2(new_scale,new_scale))
 	
 	elif event is InputEventMouseMotion: # update the line when mouse moves
+		#
+		if event.button_mask & 1:
+			var pos = get_local_mouse_position() / scale_factor - Vector2.ONE 
+			if selected_line == -1: # if no line is selected make a new one
+				lines_data.append([pos])
+				selected_line = lines_data.size() - 1
+				emit_signal('line_created')
+			else: # continue adding to old line
+				if lines_data.size() -1 >= selected_line:
+					lines_data[selected_line].append(pos)
+			emit_signal('line_updated', lines_data)
+		#
 		if move_image:
 			if selected_line == -1:
 				if !lock_image:
@@ -173,6 +186,29 @@ func _move_drawing(vect):
 		emit_signal('line_updated', lines_data)
 		_draw_lines()
 
+func _smooth_points():
+	if selected_line != -1:
+		var cur_line = lines_data[selected_line]
+		var loop = false
+		if cur_line[cur_line.size()-1] == cur_line[0]:
+			loop = true
+		for iii in range(smoothing_amount):
+			var avg_point = Vector2()
+			for i in cur_line.size():
+				avg_point = Vector2()
+				avg_point += cur_line[(i-1)%cur_line.size()]
+				avg_point += cur_line[i]
+				avg_point += cur_line[i]
+				avg_point += cur_line[(i+1)%cur_line.size()]
+				avg_point *= Vector2(.25,.25)
+				cur_line[i] = avg_point
+			if loop :
+				avg_point = (cur_line[0] + cur_line[cur_line.size()-1])/2
+				cur_line[0] = avg_point
+				cur_line[cur_line.size()-1] = avg_point
+		emit_signal('line_updated', lines_data)
+		_draw_lines()
+
 func _rotate_drawing(deg):
 	if selected_line != -1:
 		if lines_data[selected_line].size() > 1:
@@ -237,6 +273,8 @@ func _draw_lines():
 func _on_Line_Snapping_toggled(button_pressed):
 	snapping = button_pressed
 
+func _on_Smoothing_Amount_changed(value):
+	smoothing_amount = value
 
 func mouse_entered():
 	is_mouse_over = true
@@ -244,3 +282,8 @@ func mouse_entered():
 func mouse_exited():
 	is_mouse_over = false
 	_draw_lines()
+
+
+func _on_Paste_Drawing_pressed():
+	pass # Replace with function body.
+
